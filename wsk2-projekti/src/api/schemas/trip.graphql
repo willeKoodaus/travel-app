@@ -1,0 +1,36 @@
+scalar DateTime
+
+type Trip {
+  id: ID
+  user: User!
+  flight: Flight
+  accommodation: Accommodation
+  startDate: DateTime!
+  endDate: DateTime!
+  activityList: [Activity]
+  packingList: [String]
+  destination: String!
+}
+
+input TripInput {
+  user: ID
+  flight: FlightInput
+  accommodation: AccommodationInput
+  startDate: DateTime!
+  endDate: DateTime!
+  activityList: [ActivityInput]
+  packingList: [String]
+  destination: String!
+}
+
+type Query {
+  tripById(id: ID!): Trip
+  trips: [Trip]
+  tripsByUser(userId: ID!): [Trip]
+}
+
+type Mutation {
+  createTrip(input: TripInput!): Trip
+  updateTrip(id: ID!, input: TripInput): Trip
+  deleteTrip(id: ID!): Trip
+}
