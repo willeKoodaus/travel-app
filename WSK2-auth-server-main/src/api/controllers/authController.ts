@@ -29,7 +29,7 @@ const loginPost = async (
     const user = await userModel.findOne({email});
 
     if (!user) {
-      next(new CustomError('Incorrect username/password', 403));
+      next(new CustomError('No user found', 403));
       return;
     }
 
