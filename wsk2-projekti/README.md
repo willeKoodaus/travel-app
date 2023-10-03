@@ -1,30 +1,39 @@
-# SSSF week 4+5 exercise. Submit to Oma
+# TravelApp
 
-Add authentication and brute force prevention to last weeks assignment.
+TravelApp is a travel planning application where users can register, log in, and plan their trips with details like flights, accommodations, activities, and packing lists.
 
-## Getting started
+Application can be accessed online at:
+XXXXX
 
-- Clone this repo
-- create .env based on .env.example
-  - it's assumed that graphql server is in port 3000, auth server is in port 3001 and upload server is in port 3002
-  - the auth server and upload server done in the labs should work. Only change the field name in multer to 'cat'.
-- `npm i` to install dependencies
-- `npm run dev` to start development server
-- `npm run test` to run tests
+## Features
+* User Authentication
+* Add and manage trips
+* Add flights, accommodations, activities, and packing lists per trip
 
-## Assignment
+## Technical Stack
+* GraphQL
+* MongoDB
+* Express.js
+* Node.js
+* TypeScript
 
-- Your task is to complete all TODOs in the code until all tests are passed
-- TODOs are located in resolvers and app.ts
+## Dependencies
+Refer to the package.json file for a detailed list of dependencies.
 
-### Interfaces
+## Getting Started
+### Prerequisites
+* Node.js installed (v14.x or later recommended)
+* MongoDB installed and running on the default port (27017) OR MongoDB Atlas account registered
 
-- Interfaces are mostly the same as last week. The differnce is that now users have a role. This is because some operations need admin rights. The role should be embedded in the token.
+### Installation
 
-### Database
+1. Clone the repository
+2. Install npm packages for auth server, upload server and wsk2-projekti.
+3. Create .env files for each based on the .env.samples.
 
-- DB schemas are the same as last week
+### Development
+* Start the development server for wsk2-projekti, auth server and upload server by running 'npm run dev'.
+* This will start the servers in the ports specified in the .env file.
 
-# Important
-
-- Always empty your cats and users after tests.
+### Testing
+Run the tests using the command 'npm run test'.
