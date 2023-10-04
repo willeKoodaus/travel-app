@@ -13,7 +13,7 @@ type Trip {
 }
 
 input TripInput {
-  user: ID
+  user: ID!
   flight: FlightInput
   accommodation: AccommodationInput
   startDate: DateTime!

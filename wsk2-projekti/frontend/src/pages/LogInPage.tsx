@@ -40,7 +40,7 @@ const LoginPage: React.FC = () => {
 
         if (response.data.login.message === 'Login successful') {
             setIsLoggedIn(true);
-            navigate('/mytrips', { state: { user: response.data.login.user } });
+            navigate('/mytrips', { state: { userId: response.data.login.user.id } });
         } 
     } catch (error) {
         setErrorMessage('Invalid username or password');

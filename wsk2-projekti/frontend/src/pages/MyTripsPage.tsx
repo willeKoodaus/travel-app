@@ -1,6 +1,7 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
-import { useQuery, gql } from '@apollo/client';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, gql } from '@apollo/client';
+import { useEffect } from 'react';
 
 const GET_USER_TRIPS = gql`
   query GetUserTrips($userId: ID!) {
@@ -13,6 +14,14 @@ const GET_USER_TRIPS = gql`
   }
 `;
 
+const DELETE_TRIP = gql`
+  mutation DeleteTrip($id: ID!) {
+    deleteTrip(id: $id) {
+      id
+    }
+  }
+`;
+
 interface Trip {
     id: string;
     destination: string;
@@ -21,30 +30,52 @@ interface Trip {
     // ...other fields you want to fetch
   }
 
-const MyTrips = () => {
-  const location = useLocation();
-  const user = location.state.user;
-  const userId = user.id; 
-  const { loading, error, data } = useQuery(GET_USER_TRIPS, {
-    variables: { userId },
-  });
+  const MyTrips = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const userId = location.state.userId;
+    const { loading, error, data, refetch } = useQuery(GET_USER_TRIPS, { variables: { userId } });
+    useEffect(() => {
+        refetch();
+      }, []);
+    const [deleteTrip] = useMutation(DELETE_TRIP, {
+      refetchQueries: [{ query: GET_USER_TRIPS, variables: { userId } }],
+    });
+  
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error.message}</p>;
+  
+    const handleTripClick = (tripId: string) => {
+      navigate(`/trip/${tripId}`);
+    };
+  
+    const handleDeleteClick = async (tripId: string) => {
+      await deleteTrip({ variables: { id: tripId } });
+    };
+  
+    const handleEditClick = (tripId: string) => {
+      navigate(`/edit-trip/${tripId}`);
+    };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
-  return (
-    <div>
-      <h1>Here you can see your trips</h1>
-      {data.tripsByUser.map((trip:Trip)=> (
-        <div key={trip.id}>
-          <h2>{trip.destination}</h2>
-          <p>Start Date: {trip.startDate}</p>
-          <p>End Date: {trip.endDate}</p>
-          {/* Render other trip details as needed */}
-        </div>
-      ))}
-    </div>
-  );
-};
-
-export default MyTrips;
+    const handleAddTripClick = () => {
+        navigate('/create-trip', { state: { userId: userId } });
+      };
+  
+    return (
+      <div>
+        <h1>Here you can see your trips</h1>
+        <button onClick={handleAddTripClick}>Add Trip</button>
+        {data.tripsByUser.map((trip:Trip) => (
+          <div id="trip" key={trip.id} onClick={() => handleTripClick(trip.id)}>
+            <h2>{trip.destination}</h2>
+            <p>Start Date: {trip.startDate}</p>
+            <p>End Date: {trip.endDate}</p>
+            <button onClick={(e) => { e.stopPropagation(); handleEditClick(trip.id); }}>Edit</button>
+            <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(trip.id); }}>Remove</button>
+          </div>
+        ))}
+      </div>
+    );
+  };
+  
+  export default MyTrips;
