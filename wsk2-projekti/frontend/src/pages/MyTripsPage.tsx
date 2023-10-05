@@ -46,7 +46,11 @@ interface Trip {
     if (error) return <p>Error: {error.message}</p>;
   
     const handleTripClick = (tripId: string) => {
-      navigate(`/trip/${tripId}`);
+      navigate(`/trip/${tripId}`, {  
+        state: {
+        tripId: tripId,
+        userId: userId
+      }});
     };
   
     const handleDeleteClick = async (tripId: string) => {
@@ -54,8 +58,14 @@ interface Trip {
     };
   
     const handleEditClick = (tripId: string) => {
-      navigate(`/edit-trip/${tripId}`);
-    };
+        navigate(`/edit-trip/${tripId}`, {
+          state: {
+            tripId: tripId,
+            userId: userId
+          }
+        });
+      };
+
 
     const handleAddTripClick = () => {
         navigate('/create-trip', { state: { userId: userId } });
