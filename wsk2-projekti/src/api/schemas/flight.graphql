@@ -8,6 +8,7 @@ type Flight {
   arrival: DateTime!
   departureAirport: String!
   arrivalAirport: String!
+  trip: Trip!
 }
 
 input FlightInput {
@@ -17,6 +18,7 @@ input FlightInput {
   arrival: DateTime!
   departureAirport: String!
   arrivalAirport: String!
+  trip: ID!
 }
 
 type Query {

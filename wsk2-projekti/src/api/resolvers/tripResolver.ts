@@ -1,8 +1,14 @@
 // tripResolvers.js
 import { Types } from 'mongoose';
 import tripModel from '../models/tripModel';
+import { Flight } from '../../interfaces/Flight';
 
 export default {
+  Flight: {
+    trip: async (parent: Flight) => {
+      return await tripModel.findById(parent.trip);
+    },
+  },
   Query: {
     trips: async () => {
       return await tripModel.find();

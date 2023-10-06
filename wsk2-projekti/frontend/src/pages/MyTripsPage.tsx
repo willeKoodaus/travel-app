@@ -10,6 +10,9 @@ const GET_USER_TRIPS = gql`
       destination
       startDate
       endDate
+      user {
+        id
+      }
     }
   }
 `;
@@ -26,7 +29,8 @@ interface Trip {
     id: string;
     destination: string;
     startDate: string;  // Adjust the type if necessary
-    endDate: string;    // Adjust the type if necessary
+    endDate: string;
+    user: string   // Adjust the type if necessary
     // ...other fields you want to fetch
   }
 

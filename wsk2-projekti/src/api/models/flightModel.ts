@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { Flight } from '../../interfaces/Flight';
+import { Schema } from 'mongoose';
 
 const flightModel = new mongoose.Schema<Flight>({
   airline: { type: String, required: true },
@@ -8,6 +9,7 @@ const flightModel = new mongoose.Schema<Flight>({
   arrival: { type: Date, required: true },
   departureAirport: { type: String, required: true },
   arrivalAirport: { type: String, required: true },
+  trip: { type: Schema.Types.ObjectId, ref: 'Trip', required: true },
 });
 
 export default mongoose.model<Flight>('Flight', flightModel);

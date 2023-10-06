@@ -1,15 +1,17 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, gql, useMutation } from '@apollo/client';
+import { useEffect } from 'react';
 
-const GET_TRIP_BY_ID = gql`
-  query GetTripById($tripId: ID!) {
+const TRIP_BY_ID = gql`
+  query TripById($tripId: ID!) {
     tripById(id: $tripId) {
       id
       destination
       startDate
       endDate
       flight {
+        id
         airline
         flightNumber
         departure
@@ -36,20 +38,45 @@ const GET_TRIP_BY_ID = gql`
   }
 `;
 
+const DELETE_FLIGHT = gql`
+  mutation DeleteFlight($flightId: ID!) {
+    deleteFlight(id: $flightId) {
+      id
+    }
+  }
+`;
+
 
 const TripPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const tripId = location.state.tripId;
   const userId = location.state.userId;
-  const { loading, error, data } = useQuery(GET_TRIP_BY_ID, {
+  const { loading, error, data, refetch } = useQuery(TRIP_BY_ID, {
     variables: { tripId },
   });
+  useEffect(() => {
+    refetch();
+  }, []);
+  const [deleteFlight] = useMutation(DELETE_FLIGHT, {
+    onCompleted: () => {
+        refetch();
+      },
+    });
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
   const trip = data.tripById;
+  console.log(trip);
+
+  const handleRemoveFlight = async (flightId: string) => {
+    try {
+      await deleteFlight({ variables: { flightId } });
+    } catch (error) {
+      console.error('Error removing flight:', error);
+    }
+  };
 
   return (
     <div>
@@ -67,13 +94,18 @@ const TripPage: React.FC = () => {
       <p>Arrival: {trip.flight.arrival}</p>
       <p>Departure Airport: {trip.flight.departureAirport}</p>
       <p>Arrival Airport: {trip.flight.arrivalAirport}</p>
-      <button onClick={() => navigate(`/edit-flight/${tripId}`)}>Edit Flight</button>
-      <button onClick={handleRemoveFlight}>Remove Flight</button>
+      <button onClick={() => navigate(`/edit-flight/${tripId}`, )}>Edit Flight</button>
+      <button onClick={() => handleRemoveFlight(trip.flight.id)}>Remove Flight</button>
       </div>
       ) : (
         <div>
         <p>No flight information available</p>
-        <button onClick={() => navigate(`/add-flight/${tripId}`)}>Add Flight</button>
+        <button onClick={() => navigate(`/add-flight/${tripId}`, {
+          state: {
+            trip: trip,
+            userId: userId
+          }
+        })}>Add Flight</button>
         </div>
       )}
 
