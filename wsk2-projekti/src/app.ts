@@ -17,12 +17,6 @@ import authenticate from './functions/authenticate';
 const app = express();
 
 (async () => {
-  // TODO Create a rate limit rule instance
-
-    // TODO Create a permissions object
-
-    // TODO Apply the permissions object to the schema
-    // remember to change the typeDefs and resolvers to a schema object
   try {
     app.use(
       helmet({
@@ -52,6 +46,7 @@ const app = express();
         context: ({req}) => authenticate(req),
       })
     );
+    
 
     app.use(notFound);
     app.use(errorHandler);

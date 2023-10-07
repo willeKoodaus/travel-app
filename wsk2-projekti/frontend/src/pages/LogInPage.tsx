@@ -40,6 +40,7 @@ const LoginPage: React.FC = () => {
 
         if (response.data.login.message === 'Login successful') {
             setIsLoggedIn(true);
+            sessionStorage.setItem('token', response.data.login.token);
             navigate('/mytrips', { state: { userId: response.data.login.user.id } });
         } 
     } catch (error) {
