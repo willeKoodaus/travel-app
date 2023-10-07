@@ -2,10 +2,22 @@
 import { Types } from 'mongoose';
 import tripModel from '../models/tripModel';
 import { Flight } from '../../interfaces/Flight';
+import { Accommodation } from '../../interfaces/Accommodation';
+import { Activity } from '../../interfaces/Activity';
 
 export default {
+  /*Activity: {
+    trip: async (parent: Activity) => {
+      return await tripModel.findById(parent.trip);
+    },
+  },*/
   Flight: {
     trip: async (parent: Flight) => {
+      return await tripModel.findById(parent.trip);
+    },
+  },
+  Accommodation: {
+    trip: async (parent: Accommodation) => {
       return await tripModel.findById(parent.trip);
     },
   },

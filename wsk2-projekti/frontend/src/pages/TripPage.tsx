@@ -20,6 +20,7 @@ const TRIP_BY_ID = gql`
         arrivalAirport
       }
       accommodation {
+        id
         name
         address
         checkInDate
@@ -46,6 +47,13 @@ const DELETE_FLIGHT = gql`
   }
 `;
 
+const DELETE_ACCOMMODATION = gql`
+  mutation DeleteAccommodation($accommodationId: ID!) {
+    deleteAccommodation(id: $accommodationId) {
+      id
+    }
+  }
+`;
 
 const TripPage: React.FC = () => {
   const location = useLocation();
@@ -57,8 +65,14 @@ const TripPage: React.FC = () => {
   });
   useEffect(() => {
     refetch();
-  }, []);
+    console.log(data);
+  }, [data, refetch]);
   const [deleteFlight] = useMutation(DELETE_FLIGHT, {
+    onCompleted: () => {
+        refetch();
+      },
+    });
+  const [deleteAccommodation] = useMutation(DELETE_ACCOMMODATION, {
     onCompleted: () => {
         refetch();
       },
@@ -78,6 +92,12 @@ const TripPage: React.FC = () => {
     }
   };
 
+  const handleRemoveAccommodation = async () => {
+    if (trip.accommodation) {
+      await deleteAccommodation({ variables: { accommodationId: trip.accommodation.id } });
+    }
+  };
+
   return (
     <div>
       <h1>{trip.destination}</h1>
@@ -94,7 +114,6 @@ const TripPage: React.FC = () => {
       <p>Arrival: {trip.flight.arrival}</p>
       <p>Departure Airport: {trip.flight.departureAirport}</p>
       <p>Arrival Airport: {trip.flight.arrivalAirport}</p>
-      <button onClick={() => navigate(`/edit-flight/${tripId}`, )}>Edit Flight</button>
       <button onClick={() => handleRemoveFlight(trip.flight.id)}>Remove Flight</button>
       </div>
       ) : (
@@ -118,9 +137,18 @@ const TripPage: React.FC = () => {
       <p>Check In Date: {trip.accommodation.checkInDate}</p>
       <p>Check Out Date: {trip.accommodation.checkOutDate}</p>
       <p>Booking Confirmation Number: {trip.accommodation.bookingConfirmationNumber}</p>
+      <button onClick={handleRemoveAccommodation}>Remove Accommodation</button>
       </div>
       ) : (
+        <div>
         <p>No accommodation information available</p>
+        <button onClick={() => navigate(`/add-accommodation/${tripId}`, {
+          state: {
+            trip: trip,
+            userId: userId
+  }
+})}>Add Accommodation</button>
+        </div>
       )}
 
       {/* Activities Info */}

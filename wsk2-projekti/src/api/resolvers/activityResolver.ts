@@ -1,8 +1,14 @@
 // activityResolvers.js
 import { Types } from 'mongoose';
 import activityModel from '../models/activityModel';
+import { Trip } from '../../interfaces/Trip';
 
 export default {
+  /*Trip: {
+    activity: async (parent: Trip) => {
+      return await activityModel.findById(parent.accommodation);
+    },
+},*/
   Query: {
     activities: async () => {
       return await activityModel.find();
