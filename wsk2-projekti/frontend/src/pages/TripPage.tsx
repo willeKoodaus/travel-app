@@ -55,11 +55,47 @@ const DELETE_ACCOMMODATION = gql`
   }
 `;
 
+const REMOVE_ACTIVITY_FROM_TRIP = gql`
+  mutation RemoveActivityFromTrip($tripId: ID!, $activityId: ID!) {
+    removeActivityFromTrip(tripId: $tripId, activityId: $activityId) {
+      id
+      activityList {
+        id
+        name
+        date
+        location
+        description
+      }
+    }
+  }
+`;
+
+
+const ADD_ITEM_TO_PACKING_LIST = gql`
+  mutation AddItemToPackingList($tripId: ID!, $item: String!) {
+    addItemToPackingList(tripId: $tripId, item: $item) {
+      id
+      packingList
+    }
+  }
+`;
+
+const REMOVE_ITEM_FROM_PACKING_LIST = gql`
+  mutation RemoveItemFromPackingList($tripId: ID!, $item: String!) {
+    removeItemFromPackingList(tripId: $tripId, item: $item) {
+      id
+      packingList
+    }
+  }
+`;
+
+
 const TripPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const tripId = location.state.tripId;
   const userId = location.state.userId;
+  const [newItem, setNewItem] = React.useState('');
   const { loading, error, data, refetch } = useQuery(TRIP_BY_ID, {
     variables: { tripId },
   });
@@ -77,6 +113,25 @@ const TripPage: React.FC = () => {
         refetch();
       },
     });
+
+    const [removeActivityFromTrip] = useMutation(REMOVE_ACTIVITY_FROM_TRIP, {
+        onCompleted: () => {
+          refetch();
+        },
+      });
+
+  const [addItemToPackingList] = useMutation(ADD_ITEM_TO_PACKING_LIST, {
+        onCompleted: () => {
+          refetch();
+        },
+      });
+      
+  const [removeItemFromPackingList] = useMutation(REMOVE_ITEM_FROM_PACKING_LIST, {
+        onCompleted: () => {
+          refetch();
+        },
+      });
+      
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
@@ -96,6 +151,21 @@ const TripPage: React.FC = () => {
     if (trip.accommodation) {
       await deleteAccommodation({ variables: { accommodationId: trip.accommodation.id } });
     }
+  };
+
+  const handleRemoveActivity = async (activityId: string) => {
+    await removeActivityFromTrip({ variables: { tripId, activityId } });
+  };
+
+  const handleAddItem = async () => {
+    if (newItem) {
+      await addItemToPackingList({ variables: { tripId, item: newItem } });
+      setNewItem('');  // Clear the text input
+    }
+  };
+  
+  const handleRemoveItem = async (item: string) => {
+    await removeItemFromPackingList({ variables: { tripId, item } });
   };
 
   return (
@@ -152,30 +222,43 @@ const TripPage: React.FC = () => {
       )}
 
       {/* Activities Info */}
-      <h2>Activities</h2>
-      {trip.activityList && trip.activityList.length > 0 ? (
-       trip.activityList.map((activity: { name: string; date: string; location: string; description: string } , index: number) => (
+    <h2>Activities</h2>
+    <button onClick={() => navigate(`/add-activity/${tripId}`, {
+    state: {
+        trip: trip,
+        userId: userId
+    }
+    })}>Add Activity</button>
+    {trip.activityList && trip.activityList.length > 0 ? (
+    trip.activityList.map((activity: { id: string; name: string; date: string; location: string; description: string } , index: number) => (
         <div key={index}>
-          <p>Name: {activity.name}</p>
-          <p>Date: {activity.date}</p>
-          <p>Location: {activity.location}</p>
-          <p>Description: {activity.description}</p>
+        <p>Name: {activity.name}</p>
+        <p>Date: {activity.date}</p>
+        <p>Location: {activity.location}</p>
+        <p>Description: {activity.description}</p>
+        <button onClick={() => handleRemoveActivity(activity.id)}>Remove Activity</button>
         </div>
-      ))) : (
-        <p>No activities information available</p>
-      )}
+    ))
+    ) : (
+    <p>No activities information available</p>
+    )}
 
       {/* Packing List */}
       <h2>Packing List</h2>
-      {trip.packingList && trip.packingList.length > 0 ? (
-      <ul>
-        {trip.packingList.map((item: String, index: number) => (
-          <li key={index}>{item}</li>
+    <input type="text" value={newItem} onChange={(e) => setNewItem(e.target.value)} placeholder="Add item" />
+    <button onClick={handleAddItem}>Add Item</button>
+    {trip.packingList && trip.packingList.length > 0 ? (
+    <ul>
+        {trip.packingList.map((item: string, index: number) => (
+        <li key={index}>
+            {item}
+            <button onClick={() => handleRemoveItem(item)}>Remove</button>
+        </li>
         ))}
-      </ul>
-        ) : (
-        <p>No items in packing list</p>
-          )}
+    </ul>
+    ) : (
+    <p>No items in packing list</p>
+    )}
       <button onClick={() =>   navigate('/mytrips', { state: { userId: userId } })}>Back to My Trips</button>
     </div>
   );

@@ -7,6 +7,11 @@ import { MyContext } from '../../interfaces/MyContext';  // Import MyContext
 import { UserIdWithToken } from '../../interfaces/User';  // Import UserIdWithToken
 
 export default {
+  Trip: {
+    activityList: async (parent: Trip) => {
+      return await activityModel.find({ trip: parent.id }); 
+    },
+  },
   Query: {
     activities: async (_parent: undefined, _args: undefined, context: UserIdWithToken) => {
       if (!context.id) throw new Error('Not authenticated');
@@ -33,7 +38,12 @@ export default {
       const trip = await tripModel.findById(args.input.trip);
       if (trip !== null && trip.user.toString() !== context.id) throw new Error('Not authorized because userId does not match id from token');
       const activity = new activityModel(args.input);
-      return await activity.save();
+      await activity.save();  // Save the new activity
+      // Update the associated trip's activityList
+      if(trip === null) throw new Error('Trip not found');
+      trip.activityList.push(activity.id);
+      await trip.save();
+      return activity;
     },
     updateActivity: async (_parent: undefined, args: { id: Types.ObjectId, input: any }, context: UserIdWithToken) => {
       if (!context.id) throw new Error('Not authenticated');

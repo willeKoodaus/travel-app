@@ -7,7 +7,7 @@ const activityModel = new mongoose.Schema<Activity>({
   date: { type: Date, required: true },
   location: { type: String, required: true },
   description: { type: String, required: true },
- /* trip: { type: Schema.Types.ObjectId, ref: 'Trip', required: true },*/
+  trip: { type: Schema.Types.ObjectId, ref: 'Trip', required: true },
 });
 
 export default mongoose.model<Activity>('Activity', activityModel);

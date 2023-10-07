@@ -9,6 +9,7 @@ import CreateTripPage from './pages/CreateTripPage';
 import EditTripPage from './pages/EditTripPage';
 import AddFlightPage from './pages/AddFlightPage';
 import AddAccommodationPage from './pages/AddAccommodationPage';
+import AddActivityPage from './pages/AddActivityPage';
 
 const App: React.FC = () => (
   <BrowserRouter>
@@ -21,6 +22,7 @@ const App: React.FC = () => (
       <Route path="/edit-trip/*" element={<EditTripPage />} />
       <Route path="/add-flight/*" element={<AddFlightPage />} />
       <Route path="/add-accommodation/*" element={<AddAccommodationPage />} />
+      <Route path="/add-activity/*" element={<AddActivityPage />} />
       {/* ... other routes */}
     </Routes>
   </BrowserRouter>

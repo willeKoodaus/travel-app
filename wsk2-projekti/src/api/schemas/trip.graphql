@@ -33,4 +33,8 @@ type Mutation {
   createTrip(input: TripInput!): Trip
   updateTrip(id: ID!, input: TripInput): Trip
   deleteTrip(id: ID!): Trip
+  addActivityToTrip(tripId: ID!, input: ActivityInput!): Trip
+  removeActivityFromTrip(tripId: ID!, activityId: ID!): Trip
+  addItemToPackingList(tripId: ID!, item: String!): Trip
+  removeItemFromPackingList(tripId: ID!, item: String!): Trip
 }
