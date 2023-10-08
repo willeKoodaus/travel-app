@@ -120,26 +120,26 @@ describe('Testing graphql api', () => {
     await putUser(app, userData.token!);
   });
 
-  // test create trip
-  let tripData;
-  it('should create a new trip', async () => {
-    const input = {
-      user: userData.user.id,
-      destination: 'Paris',
-      startDate: new Date('2023-05-01'),
-      endDate: new Date('2023-05-10'),
-      packingList: ['passport', 'charger'],
+  // test cat upload
+  let uploadData1: UploadMessageResponse;
+  let catData1: CatTest;
+  it('should upload a cat', async () => {
+    uploadData1 = await postFile(uploadApp, userData.token!);
+    catData1 = {
+      catName: 'Test Cat' + randomstring.generate(7),
+      weight: 5,
+      birthdate: new Date('2022-01-01'),
+      filename: uploadData1.data.filename,
+      location: uploadData1.data.location,
     };
-    tripData = await postTrip(app, input, userData.token);
-    expect(tripData).toHaveProperty('id');
-    expect(tripData.destination).toEqual('Paris');
   });
 
-  // test get single trip
-  it('should return single trip', async () => {
-    const trip = await getTrip(app, tripData.id);
-    expect(trip).toHaveProperty('id');
-    expect(trip.destination).toEqual('Paris');
+  // test post cat data
+  let catID1: string;
+  it('should post cat data with file and location', async () => {
+    console.log(catData1);
+    const cat = await postCat(app, catData1, userData.token!);
+    catID1 = cat.id!;
   });
 
   // test get all cats

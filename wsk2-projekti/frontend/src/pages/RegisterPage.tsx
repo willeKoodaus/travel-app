@@ -1,6 +1,6 @@
 // src/pages/RegisterPage.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';  // Import useNavigate
 // Import the gql tag function and the Apollo Client instance
 import { gql, useMutation } from '@apollo/client';
 
@@ -23,45 +23,67 @@ const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userName, setUserName] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');  // State to hold the success message
+  const navigate = useNavigate();  // Initialize useNavigate
 
   const handleRegister = async () => {
-    const response = await register({
-      variables: {
-        user: {
-          user_name: userName,
-          email: email,
-          password: password,
+    try {
+      const response = await register({
+        variables: {
+          user: {
+            user_name: userName,
+            email: email,
+            password: password,
+          },
         },
-      },
-    });
-    console.log(response.data);  // Log the response to the console
+      });
+      console.log(response.data);  // Log the response to the console
+      setSuccessMessage('Registration successful');  // Set success message
+      setTimeout(() => {
+        navigate('/');  // Navigate to login page after a delay
+      }, 2000);  // 2 seconds delay
+    } catch (err) {
+      console.error(err);
+    }
   };
 
+
   return (
-    <div>
-      <h2>Register</h2>
-      <input
-        type="text"
-        placeholder="Username"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-      />
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleRegister}>Register</button>
-      <p>Already have an account? <Link to="/">Login</Link></p>
+    <div className="container">
+        <h2 className="my-4">Register</h2>
+        <div className="mb-3">
+            <input
+                type="text"
+                className="form-control"
+                placeholder="Username"
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
+            />
+        </div>
+        <div className="mb-3">
+            <input
+                type="email"
+                className="form-control"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+            />
+        </div>
+        <div className="mb-3">
+            <input
+                type="password"
+                className="form-control"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+            />
+        </div>
+        <button className="btn btn-primary mb-3" onClick={handleRegister}>Register</button>
+        <p>Already have an account? <Link className="text-primary" to="/">Login</Link></p>
+        {successMessage && <div className="alert alert-success mt-3">{successMessage}</div>} 
     </div>
-  );
+);
+
 };
 
 export default RegisterPage;

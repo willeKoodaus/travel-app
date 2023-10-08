@@ -56,25 +56,32 @@ const LoginPage: React.FC = () => {
   }, [isLoggedIn, navigate]); */
 
   return (
-        <div>
-            <h2>Login</h2>
+    <div className="container">
+        <h2 className="my-4">Login</h2>
+        <div className="mb-3">
             <input
                 type="email"
+                className="form-control"
                 placeholder="Email"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
             />
+        </div>
+        <div className="mb-3">
             <input
                 type="password"
+                className="form-control"
                 placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
             />
-            <button onClick={handleLogin}>Login</button>
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
-            <p>Don't have an account? <Link to="/register">Sign Up</Link></p>
         </div>
-    );
+        <button className="btn btn-primary mb-3" onClick={handleLogin}>Login</button>
+        {errorMessage && <div className="alert alert-danger" role="alert">{errorMessage}</div>}
+        <p>Don't have an account? <Link className="text-primary" to="/register">Sign Up</Link></p>
+    </div>
+);
+
   }
 
 export default LoginPage;

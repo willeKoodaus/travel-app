@@ -85,6 +85,14 @@ interface Trip {
         const yyyy = date.getFullYear();
         return dd + '.' + mm + '.' + yyyy + ' ' + date.toTimeString().split(' ')[0].substring(0, 5);
     }
+
+    // Function to handle logout
+  const handleLogout = () => {
+    sessionStorage.removeItem('token');  // Clear the user token from sessionStorage
+    navigate('/');  // Redirect to login page
+  };
+
+    
   
       return (
         <div className="container">
@@ -101,6 +109,7 @@ interface Trip {
                     </div>
                 </div>
             ))}
+            <button className="btn btn-secondary" onClick={handleLogout}>Log out</button>
         </div>
     );
 };
