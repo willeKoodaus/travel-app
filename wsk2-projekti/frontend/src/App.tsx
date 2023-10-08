@@ -10,6 +10,8 @@ import EditTripPage from './pages/EditTripPage';
 import AddFlightPage from './pages/AddFlightPage';
 import AddAccommodationPage from './pages/AddAccommodationPage';
 import AddActivityPage from './pages/AddActivityPage';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const App: React.FC = () => (
   <BrowserRouter>

@@ -1,5 +1,6 @@
 // src/index.tsx
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import ReactDOM from 'react-dom';
 import { ApolloProvider } from '@apollo/client';
 import { client } from './graphql/client';

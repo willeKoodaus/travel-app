@@ -2,6 +2,8 @@ import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, gql } from '@apollo/client';
 import { useEffect } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const GET_USER_TRIPS = gql`
   query GetUserTrips($userId: ID!) {
@@ -74,22 +76,32 @@ interface Trip {
     const handleAddTripClick = () => {
         navigate('/create-trip', { state: { userId: userId } });
       };
+
+      function formatDate(dateString: string) {
+        const date = new Date(dateString);
+        const dd = String(date.getDate()).padStart(2, '0');
+        const mm = String(date.getMonth() + 1).padStart(2, '0'); // January is 0!
+        const yyyy = date.getFullYear();
+        return dd + '.' + mm + '.' + yyyy + ' ' + date.toTimeString().split(' ')[0].substring(0, 5);
+    }
   
-    return (
-      <div>
-        <h1>Here you can see your trips</h1>
-        <button onClick={handleAddTripClick}>Add Trip</button>
-        {data.tripsByUser.map((trip:Trip) => (
-          <div id="trip" key={trip.id} onClick={() => handleTripClick(trip.id)}>
-            <h2>{trip.destination}</h2>
-            <p>Start Date: {trip.startDate}</p>
-            <p>End Date: {trip.endDate}</p>
-            <button onClick={(e) => { e.stopPropagation(); handleEditClick(trip.id); }}>Edit</button>
-            <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(trip.id); }}>Remove</button>
-          </div>
-        ))}
-      </div>
+      return (
+        <div className="container">
+            <h1 className="my-4">Here you can see your trips</h1>
+            <button className="btn btn-primary mb-4" onClick={handleAddTripClick}>Add Trip</button>
+            {data.tripsByUser.map((trip:Trip) => (
+                <div className="card mb-4" key={trip.id} onClick={() => handleTripClick(trip.id)}>
+                    <div className="card-body">
+                        <h2 className="card-title">{trip.destination}</h2>
+                        <p className="card-text">Start Date: {formatDate(trip.startDate)}</p>
+                        <p className="card-text">End Date: {formatDate(trip.endDate)}</p>
+                        <button className="btn btn-secondary mr-2" onClick={(e) => { e.stopPropagation(); handleEditClick(trip.id); }}>Edit</button>
+                        <button className="btn btn-danger" onClick={(e) => { e.stopPropagation(); handleDeleteClick(trip.id); }}>Remove</button>
+                    </div>
+                </div>
+            ))}
+        </div>
     );
-  };
-  
-  export default MyTrips;
+};
+
+export default MyTrips;

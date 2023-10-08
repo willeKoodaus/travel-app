@@ -24,6 +24,7 @@
     "@graphql-tools/merge": "^8.4.0",
     "@graphql-tools/schema": "^9.0.17",
     "bcryptjs": "^2.4.3",
+    "bootstrap": "^5.3.2",
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
@@ -36,7 +37,10 @@
     "mongoose": "^7.0.2",
     "morgan": "^1.10.0",
     "node-fetch": "^2.7.0",
-    "randomstring": "^1.2.3"
+    "randomstring": "^1.2.3",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.9.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/apidoc": "^0.50.0",
