@@ -5,3 +5,52 @@
 .card {
     padding: 20px;
 }
+
+.list li button {
+    margin: 10px;
+    font-size: 14px;
+    padding: 5px;
+}
+
+.input-group-append button {
+    margin-left: 10px;
+    font-size: 14px;
+    padding: 5px;
+}
+
+#activitybutton {
+    width: fit-content;
+    
+}
+
+#customcontainer {
+    margin-bottom: 15px;
+    margin-top: 10px;
+    background-color: #4C5C68;
+    padding: 20px;
+    padding-top: 5px;
+    border-radius: 10px;
+    
+}
+
+#customcontainer h1, #customcontainer p, #customcontainer h2 {
+    color: white;
+}
+
+.btn, .btn:hover, .btn:active, .btn:visited, .btn:focus, .btn:active:focus {
+    background-color: #46494C;
+    border: none;
+}
+
+body {
+    background-color: #DCDCDD;
+}
+
+.my-5 {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+#closebutton {
+    margin-left: 0px;
+}

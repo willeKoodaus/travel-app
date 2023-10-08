@@ -50,42 +50,58 @@ const AddAccommodationPage = () => {
     };
     await addAccommodation({ variables: { input } });
   };
-
   return (
-    <div>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Name"
-      />
-      <input
-        type="text"
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
-        placeholder="Address"
-      />
-      <input
-        type="datetime-local"
-        value={checkInDate}
-        onChange={(e) => setCheckInDate(e.target.value)}
-        placeholder="Check In Date"
-      />
-      <input
-        type="datetime-local"
-        value={checkOutDate}
-        onChange={(e) => setCheckOutDate(e.target.value)}
-        placeholder="Check Out Date"
-      />
-      <input
-        type="text"
-        value={bookingConfirmationNumber}
-        onChange={(e) => setBookingConfirmationNumber(e.target.value)}
-        placeholder="Booking Confirmation Number"
-      />
-      <button onClick={handleAddAccommodation}>Add Accommodation</button>
+    <div className="container">
+      <h1 className="my-4">Add Accommodation</h1>
+      <form>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name"
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            placeholder="Address"
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            type="datetime-local"
+            className="form-control"
+            value={checkInDate}
+            onChange={(e) => setCheckInDate(e.target.value)}
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            type="datetime-local"
+            className="form-control"
+            value={checkOutDate}
+            onChange={(e) => setCheckOutDate(e.target.value)}
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control"
+            value={bookingConfirmationNumber}
+            onChange={(e) => setBookingConfirmationNumber(e.target.value)}
+            placeholder="Booking Confirmation Number"
+          />
+        </div>
+        <button type="button" className="btn btn-primary" onClick={handleAddAccommodation}>Add Accommodation</button>
+      </form>
     </div>
   );
+  
 };
 
 export default AddAccommodationPage;

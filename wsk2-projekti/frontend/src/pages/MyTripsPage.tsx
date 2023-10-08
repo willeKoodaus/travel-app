@@ -44,6 +44,7 @@ interface Trip {
     useEffect(() => {
         refetch();
       }, [refetch]);
+
     const [deleteTrip] = useMutation(DELETE_TRIP, {
       refetchQueries: [{ query: GET_USER_TRIPS, variables: { userId } }],
     });

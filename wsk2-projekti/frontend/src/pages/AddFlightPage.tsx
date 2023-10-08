@@ -64,47 +64,67 @@ const AddFlightPage = () => {
     await addFlight({ variables: { input } });
 };
 
-  return (
-    <div>
-      <input
-        type="text"
-        value={airline}
-        onChange={(e) => setAirline(e.target.value)}
-        placeholder="Airline"
-      />
-      <input
-        type="text"
-        value={flightNumber}
-        onChange={(e) => setFlightNumber(e.target.value)}
-        placeholder="Flight Number"
-      />
-      <input
-        type="datetime-local"
-        value={departure}
-        onChange={(e) => setDeparture(e.target.value)}
-        placeholder="Departure"
-      />
-      <input
-        type="datetime-local"
-        value={arrival}
-        onChange={(e) => setArrival(e.target.value)}
-        placeholder="Arrival"
-      />
-      <input
-        type="text"
-        value={departureAirport}
-        onChange={(e) => setDepartureAirport(e.target.value)}
-        placeholder="Departure Airport"
-      />
-      <input
-        type="text"
-        value={arrivalAirport}
-        onChange={(e) => setArrivalAirport(e.target.value)}
-        placeholder="Arrival Airport"
-      />
-      <button onClick={handleAddFlight}>Add Flight</button>
-    </div>
-  );
+return (
+  <div className="container">
+    <h1 className="my-4">Add Flight</h1>
+    <form>
+      <div className="mb-3">
+        <input
+          type="text"
+          className="form-control"
+          value={airline}
+          onChange={(e) => setAirline(e.target.value)}
+          placeholder="Airline"
+        />
+      </div>
+      <div className="mb-3">
+        <input
+          type="text"
+          className="form-control"
+          value={flightNumber}
+          onChange={(e) => setFlightNumber(e.target.value)}
+          placeholder="Flight Number"
+        />
+      </div>
+      <div className="mb-3">
+        <input
+          type="datetime-local"
+          className="form-control"
+          value={departure}
+          onChange={(e) => setDeparture(e.target.value)}
+        />
+      </div>
+      <div className="mb-3">
+        <input
+          type="datetime-local"
+          className="form-control"
+          value={arrival}
+          onChange={(e) => setArrival(e.target.value)}
+        />
+      </div>
+      <div className="mb-3">
+        <input
+          type="text"
+          className="form-control"
+          value={departureAirport}
+          onChange={(e) => setDepartureAirport(e.target.value)}
+          placeholder="Departure Airport"
+        />
+      </div>
+      <div className="mb-3">
+        <input
+          type="text"
+          className="form-control"
+          value={arrivalAirport}
+          onChange={(e) => setArrivalAirport(e.target.value)}
+          placeholder="Arrival Airport"
+        />
+      </div>
+      <button type="button" className="btn btn-primary" onClick={handleAddFlight}>Add Flight</button>
+    </form>
+  </div>
+);
+
 };
 
 export default AddFlightPage;

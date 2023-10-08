@@ -63,38 +63,44 @@ const EditTripPage = () => {
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
-
+  
   return (
-    <div>
-      <h1>Edit Trip</h1>
+    <div className="container">
+      <h1 className="my-4">Edit Trip</h1>
       <form onSubmit={handleSubmit}>
-        <label>
-          Destination:
+        <div className="mb-3">
+          <label htmlFor="destination" className="form-label">Destination:</label>
           <input
             type="text"
+            id="destination"
+            className="form-control"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
           />
-        </label>
-        <label>
-          Start Date:
+        </div>
+        <div className="mb-3">
+          <label htmlFor="startDate" className="form-label">Start Date:</label>
           <input
             type="date"
+            id="startDate"
+            className="form-control"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
           />
-        </label>
-        <label>
-          End Date:
+        </div>
+        <div className="mb-3">
+          <label htmlFor="endDate" className="form-label">End Date:</label>
           <input
             type="date"
+            id="endDate"
+            className="form-control"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
           />
-        </label>
-        <button type="submit">Save</button>
+        </div>
+        <button type="submit" className="btn btn-primary">Save</button>
       </form>
-      <button onClick={handleClose}>Close</button>
+      <button id="closebutton" className="btn btn-secondary mt-3" onClick={handleClose}>Close</button>
     </div>
   );
 };

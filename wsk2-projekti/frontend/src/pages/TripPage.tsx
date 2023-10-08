@@ -103,6 +103,10 @@ const TripPage: React.FC = () => {
     const { loading, error, data, refetch } = useQuery(TRIP_BY_ID, {
       variables: { tripId },
     });
+    
+    useEffect(() => {
+      refetch();
+    }, [refetch]);
 
     const [deleteFlight] = useMutation(DELETE_FLIGHT, {
       onCompleted: () => {
@@ -215,10 +219,11 @@ const TripPage: React.FC = () => {
   
     return (
         <div className="container">
+          <div id="customcontainer">
             <h1 className="my-4">{trip.destination}</h1>
             <p className="card-text">Start Date: {formatDate(trip.startDate)}</p>
             <p className="card-text">End Date: {formatDate(trip.endDate)}</p>
-                
+            </div>
             {/* Flight Info */}
             <div className="card mb-4">
             <h2 className="my-4">Flight Info</h2>
@@ -273,7 +278,7 @@ const TripPage: React.FC = () => {
             {/* Activities Info */}
             <div className="card mb-4">
             <h2 className="my-4">Activities</h2>
-            <button className="btn btn-primary mb-4" onClick={() => navigate(`/add-activity/${tripId}`, {
+            <button id="activitybutton" className="btn btn-primary mb-4" onClick={() => navigate(`/add-activity/${tripId}`, {
                 state: {
                     trip: trip,
                     userId: userId
@@ -318,6 +323,7 @@ const TripPage: React.FC = () => {
             </div>
     
             {/* Suggested Attractions */}
+            <div id="customcontainer">
             <h2 className="my-4">Suggested Attractions</h2>
             {isFetchingAttractions ? (
                 <p>Loading...</p>
@@ -332,6 +338,7 @@ const TripPage: React.FC = () => {
             ) : (
                 <p>No suggested attractions available</p>
             )}
+            </div>
     
             <button className="btn btn-secondary" onClick={() => navigate('/mytrips', { state: { userId: userId } })}>Back to My Trips</button>
         </div>

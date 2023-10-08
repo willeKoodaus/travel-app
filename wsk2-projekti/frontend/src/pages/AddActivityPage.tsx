@@ -41,15 +41,48 @@ const AddActivityPage: React.FC = () => {
   };
 
   return (
-    <div>
-      <h1>Add Activity</h1>
-      <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Name" />
-      <input type="datetime-local" value={date} onChange={(e) => setDate(e.target.value)} placeholder="Date" />
-      <input type="text" value={locationText} onChange={(e) => setLocationText(e.target.value)} placeholder="Location" />
-      <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description"></textarea>
-      <button onClick={handleAddActivity}>Add Activity</button>
+    <div className="container">
+      <h1 className="my-4">Add Activity</h1>
+      <form>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Name"
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            type="datetime-local"
+            className="form-control"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control"
+            value={locationText}
+            onChange={(e) => setLocationText(e.target.value)}
+            placeholder="Location"
+          />
+        </div>
+        <div className="mb-3">
+          <textarea
+            className="form-control"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Description"
+          ></textarea>
+        </div>
+        <button type="button" className="btn btn-primary" onClick={handleAddActivity}>Add Activity</button>
+      </form>
     </div>
   );
+  
 };
 
 export default AddActivityPage;
