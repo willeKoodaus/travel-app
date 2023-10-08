@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, gql, useMutation } from '@apollo/client';
-import { useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const TRIP_BY_ID = gql`
   query TripById($tripId: ID!) {
@@ -91,115 +91,149 @@ const REMOVE_ITEM_FROM_PACKING_LIST = gql`
 
 
 const TripPage: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const tripId = location.state.tripId;
-  const userId = location.state.userId;
-  const [newItem, setNewItem] = React.useState('');
-  const { loading, error, data, refetch } = useQuery(TRIP_BY_ID, {
-    variables: { tripId },
-  });
-  useEffect(() => {
-    refetch();
-    console.log(data);
-  }, [data, refetch]);
-  const [deleteFlight] = useMutation(DELETE_FLIGHT, {
-    onCompleted: () => {
-        refetch();
-      },
-    });
-  const [deleteAccommodation] = useMutation(DELETE_ACCOMMODATION, {
-    onCompleted: () => {
-        refetch();
-      },
+    const location = useLocation();
+    const navigate = useNavigate();
+    const tripId = location.state.tripId;
+    const userId = location.state.userId;
+    const [newItem, setNewItem] = React.useState('');
+    const [isFetchingAttractions, setIsFetchingAttractions] = useState(false);
+    const { loading, error, data, refetch } = useQuery(TRIP_BY_ID, {
+      variables: { tripId },
     });
 
-    const [removeActivityFromTrip] = useMutation(REMOVE_ACTIVITY_FROM_TRIP, {
-        onCompleted: () => {
+    const [deleteFlight] = useMutation(DELETE_FLIGHT, {
+      onCompleted: () => {
           refetch();
         },
       });
-
-  const [addItemToPackingList] = useMutation(ADD_ITEM_TO_PACKING_LIST, {
-        onCompleted: () => {
-          refetch();
-        },
-      });
-      
-  const [removeItemFromPackingList] = useMutation(REMOVE_ITEM_FROM_PACKING_LIST, {
-        onCompleted: () => {
-          refetch();
-        },
-      });
-      
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
-  const trip = data.tripById;
-  console.log(trip);
-
-  const handleRemoveFlight = async (flightId: string) => {
-    try {
-      await deleteFlight({ variables: { flightId } });
-    } catch (error) {
-      console.error('Error removing flight:', error);
-    }
-  };
-
-  const handleRemoveAccommodation = async () => {
-    if (trip.accommodation) {
-      await deleteAccommodation({ variables: { accommodationId: trip.accommodation.id } });
-    }
-  };
-
-  const handleRemoveActivity = async (activityId: string) => {
-    await removeActivityFromTrip({ variables: { tripId, activityId } });
-  };
-
-  const handleAddItem = async () => {
-    if (newItem) {
-      await addItemToPackingList({ variables: { tripId, item: newItem } });
-      setNewItem('');  // Clear the text input
-    }
-  };
   
-  const handleRemoveItem = async (item: string) => {
-    await removeItemFromPackingList({ variables: { tripId, item } });
-  };
+    const [deleteAccommodation] = useMutation(DELETE_ACCOMMODATION, {
+      onCompleted: () => {
+          refetch();
+        },
+      });
+  
+      const [removeActivityFromTrip] = useMutation(REMOVE_ACTIVITY_FROM_TRIP, {
+          onCompleted: () => {
+            refetch();
+          },
+        });
+  
+    const [addItemToPackingList] = useMutation(ADD_ITEM_TO_PACKING_LIST, {
+          onCompleted: () => {
+            refetch();
+          },
+        });
+  
+    const [removeItemFromPackingList] = useMutation(REMOVE_ITEM_FROM_PACKING_LIST, {
+          onCompleted: () => {
+            refetch();
+          },
+        });
+  
+    const [suggestedAttractions, setSuggestedAttractions] = useState<{ name: string, description: string }[]>([]);
+  
+    const fetchAttractions = useCallback(async (destination: string) => {
+        setIsFetchingAttractions(true);
+        try {
+          const response = await fetch('http://localhost:3003/gpt', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              userMessage: `What are the top 5 attractions in ${destination}?`,
+            }),
+          });
+          const data = await response.json();
+          const attractionsDescriptions = data.text.split('\n\n');  // Split the string into an array
+          const attractionsArray = attractionsDescriptions.map((description: string) => {
+            const parts = description.split(': ');  // Split the name from the description
+            return { name: parts[0], description: parts[1] };
+          });
+          setSuggestedAttractions(attractionsArray);
+        } catch (error) {
+          console.error('Error fetching attractions:', error);
+        }
+        setIsFetchingAttractions(false);  
+      }, []);
+    
+    
+      useEffect(() => {
+        if (data && data.tripById) {
+          fetchAttractions(data.tripById.destination);
+        }
+      }, [data, fetchAttractions]);
+  
+    if (loading) return <p>Loading...</p>;
+    if (error) return <p>Error: {error.message}</p>;
 
-  return (
-    <div>
-      <h1>{trip.destination}</h1>
-      <p>Start Date: {trip.startDate}</p>
-      <p>End Date: {trip.endDate}</p>
+    const trip = data.tripById;
 
-      {/* Flight Info */}
-      <h2>Flight Info</h2>
-      {trip.flight ? (
+
+
+  
+    const handleRemoveFlight = async (flightId: string) => {
+      try {
+        await deleteFlight({ variables: { flightId } });
+      } catch (error) {
+        console.error('Error removing flight:', error);
+      }
+    };
+  
+    const handleRemoveAccommodation = async () => {
+      if (trip.accommodation) {
+        await deleteAccommodation({ variables: { accommodationId: trip.accommodation.id } });
+      }
+    };
+  
+    const handleRemoveActivity = async (activityId: string) => {
+      await removeActivityFromTrip({ variables: { tripId, activityId } });
+    };
+  
+    const handleAddItem = async () => {
+      if (newItem) {
+        await addItemToPackingList({ variables: { tripId, item: newItem } });
+        setNewItem('');  // Clear the text input
+      }
+    };
+    
+    const handleRemoveItem = async (item: string) => {
+      await removeItemFromPackingList({ variables: { tripId, item } });
+    };
+  
+    return (
       <div>
-      <p>Airline: {trip.flight.airline}</p>
-      <p>Flight Number: {trip.flight.flightNumber}</p>
-      <p>Departure: {trip.flight.departure}</p>
-      <p>Arrival: {trip.flight.arrival}</p>
-      <p>Departure Airport: {trip.flight.departureAirport}</p>
-      <p>Arrival Airport: {trip.flight.arrivalAirport}</p>
-      <button onClick={() => handleRemoveFlight(trip.flight.id)}>Remove Flight</button>
-      </div>
-      ) : (
+        <h1>{trip.destination}</h1>
+        <p>Start Date: {trip.startDate}</p>
+        <p>End Date: {trip.endDate}</p>
+  
+        {/* Flight Info */}
+        <h2>Flight Info</h2>
+        {trip.flight ? (
         <div>
-        <p>No flight information available</p>
-        <button onClick={() => navigate(`/add-flight/${tripId}`, {
-          state: {
-            trip: trip,
-            userId: userId
-          }
-        })}>Add Flight</button>
+        <p>Airline: {trip.flight.airline}</p>
+        <p>Flight Number: {trip.flight.flightNumber}</p>
+        <p>Departure: {trip.flight.departure}</p>
+        <p>Arrival: {trip.flight.arrival}</p>
+        <p>Departure Airport: {trip.flight.departureAirport}</p>
+        <p>Arrival Airport: {trip.flight.arrivalAirport}</p>
+        <button onClick={() => handleRemoveFlight(trip.flight.id)}>Remove Flight</button>
         </div>
-      )}
+        ) : (
+          <div>
+          <p>No flight information available</p>
+          <button onClick={() => navigate(`/add-flight/${tripId}`, {
+            state: {
+              trip: trip,
+              userId: userId
+            }
+          })}>Add Flight</button>
+          </div>
+        )}
 
-      {/* Accommodation Info */}
-      <h2>Accommodation</h2>
+       {/* Accommodation Info */}
+       <h2>Accommodation</h2>
       {trip.accommodation ? (
       <div>
       <p>Name: {trip.accommodation.name}</p>
@@ -216,8 +250,8 @@ const TripPage: React.FC = () => {
           state: {
             trip: trip,
             userId: userId
-  }
-})}>Add Accommodation</button>
+          }
+        })}>Add Accommodation</button>
         </div>
       )}
 
@@ -259,6 +293,23 @@ const TripPage: React.FC = () => {
     ) : (
     <p>No items in packing list</p>
     )}
+
+      {/* Suggested Attractions */}
+      <h2>Suggested Attractions</h2>
+      {isFetchingAttractions ? (
+      <p>Loading...</p>
+    ) : suggestedAttractions.length > 0 ? (
+      <ul>
+        {suggestedAttractions.map((attraction, index) => (
+          <li key={index}>
+            <strong>{attraction.name}</strong>: {attraction.description}
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <p>No suggested attractions available</p>
+    )}
+
       <button onClick={() =>   navigate('/mytrips', { state: { userId: userId } })}>Back to My Trips</button>
     </div>
   );
