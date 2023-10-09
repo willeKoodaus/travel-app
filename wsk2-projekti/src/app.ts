@@ -60,7 +60,6 @@ interface Message {
             })
         );
 
-        // New route to handle /generate-text
         app.post('/gpt', async (req: Request, res: Response) => {
             const { userMessage } = req.body;
             const conversation: Message[] = [

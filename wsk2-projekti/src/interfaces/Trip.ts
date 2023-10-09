@@ -16,4 +16,16 @@ interface Trip extends Document {
   destination: string;
 }
 
-export {Trip};
+interface TripTest {
+  id?: string;
+  user?: Types.ObjectId | User;
+  flight?: Types.ObjectId | Flight;
+  accommodation?: Types.ObjectId | Accommodation;
+  startDate?: Date;
+  endDate?: Date;
+  activityList?: (Types.ObjectId | Activity)[];
+  packingList?: string[];
+  destination?: string;
+}
+
+export {Trip, TripTest};

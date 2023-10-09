@@ -1,37 +1,31 @@
 import app from '../src/app';
 import {
+  postTrip,
+  getTrips,
+  getSingleTrip,
+  userPutTrip,
+  wrongUserPutTrip,
+  userDeleteTrip,
+  wrongUserDeleteTrip,
+  getTripsByUser
+} from './tripFunctions';
+import { TripTest } from '../src/interfaces/Trip';
+import mongoose from 'mongoose';
+import { getNotFound } from './testFunctions';
+import {
+  postUser,
+  loginUser,
   adminDeleteUser,
   deleteUser,
   getSingleUser,
   getUser,
-  loginBrute,
-  loginUser,
-  postUser,
-  putUser,
+  putUser
 } from './userFunctions';
-import {UserTest} from '../src/interfaces/User';
-import mongoose from 'mongoose';
-import {getNotFound} from './testFunctions';
-import {
-  postTrip,
-  getTrip,
-  getTrips,
-  getTripsByUser,
-  updateTrip,
-  deleteTrip,
-  addActivityToTrip,
-  removeActivityFromTrip,
-  addItemToPackingList,
-  removeItemFromPackingList,
-} from './tripFunctions';
-
-const uploadApp = process.env.UPLOAD_URL as string;
-
+import { UserTest } from '../src/interfaces/User';
 import randomstring from 'randomstring';
-import UploadMessageResponse from '../src/interfaces/UploadMessageResponse';
-import {CatTest} from '../src/interfaces/Trip';
-import LoginMessageResponse from '../src/interfaces/LoginMessageResponse';
 import jwt from 'jsonwebtoken';
+import LoginMessageResponse from '../src/interfaces/LoginMessageResponse';
+import '@testing-library/jest-dom';
 
 describe('Testing graphql api', () => {
   beforeAll(async () => {
@@ -101,7 +95,6 @@ describe('Testing graphql api', () => {
       userData.token!,
       process.env.JWT_SECRET as string
     );
-    
     expect(dataFromToken).toHaveProperty('role');
   });
 
@@ -120,110 +113,64 @@ describe('Testing graphql api', () => {
     await putUser(app, userData.token!);
   });
 
+  // test trip-related functionalities
+ 
+  const testTrip: TripTest = {
+    destination: 'Test Destination ' + randomstring.generate(7),
+    startDate: new Date('2023-01-01'),
+    endDate: new Date('2023-01-10'),
+    // ... other trip properties
+  };
+
   // test create trip
-  let tripData;
+  let tripID: string;
   it('should create a new trip', async () => {
-    const input = {
-      user: userData.user.id,
-      destination: 'Paris',
-      startDate: new Date('2023-05-01'),
-      endDate: new Date('2023-05-10'),
-      packingList: ['passport', 'charger'],
+    const trip = await postTrip(app, testTrip, userData.user!, userData.token!);
+    tripID = trip.id!;
+  });
+
+// test get all trips
+it('should return array of trips', async () => {
+    await getTrips(app, userData.token!);
+  });
+  
+
+// test get single trip
+it('should return single trip', async () => {
+    await getSingleTrip(app, tripID, userData.token!);
+  });
+  
+
+// get trips by user id
+it('should return trips by current user', async () => {
+    await getTripsByUser(app, userData.user.id!, userData.token!);
+  });
+  
+
+  // modify trip as wrong user
+  it('should not modify a trip', async () => {
+    const newTrip: TripTest = {
+      destination: 'Modified Destination ' + randomstring.generate(7),
     };
-    tripData = await postTrip(app, input, userData.token);
-    expect(tripData).toHaveProperty('id');
-    expect(tripData.destination).toEqual('Paris');
+    await wrongUserPutTrip(app, tripID, newTrip, userData2.token!);
   });
 
-  // test get single trip
-  it('should return single trip', async () => {
-    const trip = await getTrip(app, tripData.id);
-    expect(trip).toHaveProperty('id');
-    expect(trip.destination).toEqual('Paris');
+  // delete trip as wrong user
+  it('should not delete a trip', async () => {
+    await wrongUserDeleteTrip(app, tripID, userData2.token!);
   });
 
-  // test get all cats
-  it('should return array of cats', async () => {
-    await getCat(app);
-  });
-
-  // test get single cat
-  it('should return single cat', async () => {
-    await getSingleCat(app, catID1);
-  });
-
-  // get cats by user id
-  it('should return cats by current user', async () => {
-    await getCatByOwner(app, userData.user.id!);
-  });
-
-  // get cats by bounding box
-  it('should return cats by bounding box', async () => {
-    const location = {
-      topRight: {
-        lat: 70.1,
-        lng: 30.8,
-      },
-      bottomLeft: {
-        lat: 60.1,
-        lng: 19.8,
-      },
+  // modify trip by id
+  it('should modify a trip', async () => {
+    const newTrip: TripTest = {
+      destination: 'Modified Destination ' + randomstring.generate(7),
     };
-
-    await getCatByBoundingBox(app, location);
+    await userPutTrip(app, tripID, newTrip, userData.token!);
   });
 
-  // modify cat as second user
-  it('should not modify a cat', async () => {
-    const newCat: CatTest = {
-      catName: 'Test Cat' + randomstring.generate(7),
-    };
-    await wrongUserPutCat(app, newCat, catID1, userData2.token!);
-  });
-
-  // delete cat as second user
-  it('should not delete a cat', async () => {
-    await wrongUserDeleteCat(app, catID1, userData2.token!);
-  });
-
-  // modify cat by id
-  it('should modify a cat', async () => {
-    const newCat: CatTest = {
-      catName: 'Test Cat' + randomstring.generate(7),
-      weight: 5,
-      birthdate: new Date('2019-01-01'),
-    };
-    await userPutCat(app, newCat, catID1, userData.token!);
-  });
-
-  // modify cat by id as admin
-  it('should modify a cat as admin', async () => {
-    const newCat: CatTest = {
-      catName: 'Test Cat' + randomstring.generate(7),
-    };
-    await adminPutCat(app, newCat, catID1, adminData.token!);
-  });
-
-  // test delete cat
-  it('should delete a cat', async () => {
-    await userDeleteCat(app, catID1, userData.token!);
-  });
-
-  // post another cat with same file and location
-  let catID2: string;
-  it('should upload another cat', async () => {
-    const cat = await postCat(app, catData1, userData.token!);
-    catID2 = cat.id!;
-  });
-
-  // test delete cat by id as admin
-  it('should delete a cat as admin', async () => {
-    await adminDeleteCat(app, catID2, adminData.token!);
-  });
-
-  // it should not delete user by id as normal user
-  it('should not delete a user', async () => {
-    await wrongUserDeleteCat(app, userData2.user.id!, userData.token!);
+  // test delete trip
+  it('should delete a trip', async () => {
+    await userDeleteTrip(app, tripID, userData.token!);
   });
 
   // test delete user by id as admin

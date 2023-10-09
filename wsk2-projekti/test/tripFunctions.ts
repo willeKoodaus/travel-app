@@ -1,93 +1,288 @@
-// tripFunctions.ts
+/* eslint-disable node/no-unpublished-import */
 import request from 'supertest';
-import { Express } from 'express';
+import expect from 'expect';
+import { TripTest } from '../src/interfaces/Trip';  // Assuming you have this interface setup similar to CatTest
+import { UserTest } from '../src/interfaces/User';  // Existing import from your example
+import '@testing-library/jest-dom';
+require('dotenv').config();
 
-// Function to post a new trip
-export async function postTrip(app: Express, tripData: any, token: string) {
-  const response = await request(app)
-    .post('/graphql')
-    .set('Authorization', `Bearer ${token}`)
-    .send({
-      query: `
-        mutation {
-          createTrip(input: {
-            destination: "${tripData.destination}",
-            startDate: "${tripData.startDate}",
-            endDate: "${tripData.endDate}",
-          }) {
-            trip {
-              id
-              destination
-              startDate
-              endDate
-            }
-          }
-        }
-      `
-    });
-  return response.body.data.createTrip.trip;
-}
-
-// Function to get a single trip
-export async function getSingleTrip(app: Express, tripId: string) {
-  const response = await request(app)
-    .post('/graphql')
-    .send({
-      query: `
-        query {
-          trip(id: "${tripId}") {
-            id
-            destination
-            startDate
-            endDate
-          }
-        }
-      `
-    });
-  return response.body.data.trip;
-}
-
-// Function to update a trip
-export async function updateTrip(app: Express, tripId: string, updatedData: any, token: string) {
-  const response = await request(app)
-    .post('/graphql')
-    .set('Authorization', `Bearer ${token}`)
-    .send({
-      query: `
-        mutation {
-          updateTrip(id: "${tripId}", input: {
-            destination: "${updatedData.destination}",
-            startDate: "${updatedData.startDate}",
-            endDate: "${updatedData.endDate}",
-          }) {
-            trip {
-              id
-              destination
-              startDate
-              endDate
-            }
-          }
-        }
-      `
-    });
-  return response.body.data.updateTrip.trip;
-}
-
-// Function to delete a trip
-export async function deleteTrip(app: Express, tripId: string, token: string) {
-    const response = await request(app)
+// Helper function to create a new trip
+const postTrip = (
+  url: string | Function,
+  trip: TripTest,
+  user: UserTest,
+  token: string
+): Promise<TripTest> => {
+  return new Promise((resolve, reject) => {
+    request(url)
       .post('/graphql')
+      .set('Content-type', 'application/json')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        query: `
-          mutation {
-            deleteTrip(id: "${tripId}") {
-              id
-              destination
+        query: `mutation CreateTrip($input: TripInput!) {
+          createTrip(input: $input) {
+            id
+            user {
+              user_name
             }
+            startDate
+            endDate
+            destination
           }
-        `
+        }`,
+        variables: {
+            input: {
+              user: user.id,
+              startDate: trip.startDate,
+              endDate: trip.endDate,
+              destination: trip.destination,
+            },
+        }
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          console.log("tripFunctions line 48",response.body.data);
+          const newTrip = response.body.data.createTrip;
+          expect(newTrip).toHaveProperty('id');
+          expect(newTrip).toHaveProperty('user');
+          expect(newTrip).toHaveProperty('startDate');
+          expect(newTrip).toHaveProperty('endDate');
+          expect(newTrip).toHaveProperty('destination');
+          resolve(newTrip);
+        }
       });
-    return response.body.data.deleteTrip;
-  }
+  });
+};
 
+// Helper function to retrieve all trips
+const getTrips = (url: string | Function, token: string): Promise<TripTest[]> => {
+  return new Promise((resolve, reject) => {
+    request(url)
+      .post('/graphql')
+      .set('Content-type', 'application/json')
+      .set('Authorization', `Bearer ${token}`)
+      .send({
+        query: `query {
+          trips {
+            id
+            user {
+              user_name
+            }
+            flight {
+              id
+            }
+            accommodation {
+              id
+            }
+            startDate
+            endDate
+            activityList {
+              id
+            }
+            packingList
+            destination
+          }
+        }`,
+      })
+      .expect(200, (err, response) => {
+        if (err) {
+          reject(err);
+        } else {
+          const trips = response.body.data.trips;
+          expect(trips).toBeInstanceOf(Array);
+          resolve(trips);
+        }
+      });
+  });
+};
+
+// Helper function to retrieve a single trip by ID
+const getSingleTrip = (url: string | Function, id: string, token: string): Promise<TripTest> => {
+    return new Promise((resolve, reject) => {
+      request(url)
+        .post('/graphql')
+        .set('Content-type', 'application/json')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          query: `query TripById($id: ID!) {
+            tripById(id: $id) {
+              id
+              // ...other fields
+            }
+          }`,
+          variables: { id },
+        })
+        .expect(200, (err, response) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response.body.data.tripById);
+          }
+        });
+    });
+  };
+  
+  // Helper function to update a trip
+  const userPutTrip = (
+    url: string | Function,
+    id: string,
+    input: TripTest,
+    token: string
+  ): Promise<TripTest> => {
+    return new Promise((resolve, reject) => {
+      request(url)
+        .post('/graphql')
+        .set('Content-type', 'application/json')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          query: `mutation UpdateTrip($id: ID!, $input: TripInput) {
+            updateTrip(id: $id, input: $input) {
+              id
+              // ...other fields
+            }
+          }`,
+          variables: { id, input },
+        })
+        .expect(200, (err, response) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response.body.data.updateTrip);
+          }
+        });
+    });
+  };
+  
+  // Helper function to attempt updating a trip with wrong user or incorrect input
+const wrongUserPutTrip = (
+    url: string | Function,
+    id: string,
+    input: TripTest,
+    token: string
+  ): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      request(url)
+        .post('/graphql')
+        .set('Content-type', 'application/json')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          query: `mutation UpdateTrip($id: ID!, $input: TripInput) {
+            updateTrip(id: $id, input: $input) {
+              id
+              // ...other fields
+            }
+          }`,
+          variables: { id, input },
+        })
+        .expect(400, (err, response) => {  // Change 400 to the expected error status code
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response.body.errors);  // Adjust as needed to match your error handling
+          }
+        });
+    });
+  };
+  
+  // Helper function to delete a trip
+  const userDeleteTrip = (
+    url: string | Function,
+    id: string,
+    token: string
+  ): Promise<TripTest> => {
+    return new Promise((resolve, reject) => {
+      request(url)
+        .post('/graphql')
+        .set('Content-type', 'application/json')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          query: `mutation DeleteTrip($id: ID!) {
+            deleteTrip(id: $id) {
+              id
+            }
+          }`,
+          variables: { id },
+        })
+        .expect(200, (err, response) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response.body.data.deleteTrip);
+          }
+        });
+    });
+  };
+  
+  // Helper function to attempt deleting a trip with wrong user or unauthorized access
+const wrongUserDeleteTrip = (
+    url: string | Function,
+    id: string,
+    token: string
+  ): Promise<any> => {
+    return new Promise((resolve, reject) => {
+      request(url)
+        .post('/graphql')
+        .set('Content-type', 'application/json')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          query: `mutation DeleteTrip($id: ID!) {
+            deleteTrip(id: $id) {
+              id
+            }
+          }`,
+          variables: { id },
+        })
+        .expect(400, (err, response) => {  // Change 400 to the expected error status code
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response.body.errors);  // Adjust as needed to match your error handling
+          }
+        });
+    });
+  };
+  
+  // Helper function to retrieve all trips by a specific user
+  const getTripsByUser = (
+    url: string | Function,
+    userId: string,
+    token: string
+  ): Promise<TripTest[]> => {
+    return new Promise((resolve, reject) => {
+      request(url)
+        .post('/graphql')
+        .set('Content-type', 'application/json')
+        .set('Authorization', `Bearer ${token}`)
+        .send({
+          query: `query TripsByUser($userId: ID!) {
+            tripsByUser(userId: $userId) {
+              id
+              // ...other fields
+            }
+          }`,
+          variables: { userId },
+        })
+        .expect(200, (err, response) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response.body.data.tripsByUser);
+          }
+        });
+    });
+  };
+  
+  // Exporting all functions
+  export {
+    postTrip,
+    getTrips,
+    getSingleTrip,
+    userPutTrip,
+    wrongUserPutTrip,
+    userDeleteTrip,
+    wrongUserDeleteTrip,
+    getTripsByUser
+  };
+  
