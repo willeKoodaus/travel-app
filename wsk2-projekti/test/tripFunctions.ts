@@ -70,18 +70,8 @@ const getTrips = (url: string | Function, token: string): Promise<TripTest[]> =>
             user {
               user_name
             }
-            flight {
-              id
-            }
-            accommodation {
-              id
-            }
             startDate
             endDate
-            activityList {
-              id
-            }
-            packingList
             destination
           }
         }`,
@@ -109,10 +99,9 @@ const getSingleTrip = (url: string | Function, id: string, token: string): Promi
           query: `query TripById($id: ID!) {
             tripById(id: $id) {
               id
-              // ...other fields
             }
           }`,
-          variables: { id },
+          variables: { id: id },
         })
         .expect(200, (err, response) => {
           if (err) {
@@ -137,18 +126,22 @@ const getSingleTrip = (url: string | Function, id: string, token: string): Promi
         .set('Content-type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          query: `mutation UpdateTrip($id: ID!, $input: TripInput) {
+          query: `mutation UpdateTrip($id: ID!, $input: updateTripInput) {
             updateTrip(id: $id, input: $input) {
               id
-              // ...other fields
             }
           }`,
-          variables: { id, input },
+          variables: { id: id,  input: {
+            destination: input.destination,
+          }, }
         })
         .expect(200, (err, response) => {
           if (err) {
             reject(err);
           } else {
+            const newTrip = response.body.data.updateTrip;
+            expect(newTrip).toHaveProperty('id');
+            resolve(newTrip);
             resolve(response.body.data.updateTrip);
           }
         });
@@ -168,18 +161,21 @@ const wrongUserPutTrip = (
         .set('Content-type', 'application/json')
         .set('Authorization', `Bearer ${token}`)
         .send({
-          query: `mutation UpdateTrip($id: ID!, $input: TripInput) {
+          query: `mutation UpdateTrip($id: ID!, $input: updateTripInput) {
             updateTrip(id: $id, input: $input) {
               id
-              // ...other fields
             }
           }`,
-          variables: { id, input },
+          variables: { id: id, input: {
+            destination: input.destination,
+          }, }
         })
-        .expect(400, (err, response) => {  // Change 400 to the expected error status code
+        .expect(200, (err, response) => { 
           if (err) {
             reject(err);
           } else {
+            expect(response.body.errors).toBeDefined()
+            expect(response.body.errors[0].message).toBe('Not authorized because userId does not match id from token');
             resolve(response.body.errors);  // Adjust as needed to match your error handling
           }
         });
@@ -234,10 +230,12 @@ const wrongUserDeleteTrip = (
           }`,
           variables: { id },
         })
-        .expect(400, (err, response) => {  // Change 400 to the expected error status code
+        .expect(200, (err, response) => {  // Change 400 to the expected error status code
           if (err) {
             reject(err);
           } else {
+            expect(response.body.errors).toBeDefined()
+            expect(response.body.errors[0].message).toBe('Not authorized because userId does not match id from token');
             resolve(response.body.errors);  // Adjust as needed to match your error handling
           }
         });
@@ -259,7 +257,6 @@ const wrongUserDeleteTrip = (
           query: `query TripsByUser($userId: ID!) {
             tripsByUser(userId: $userId) {
               id
-              // ...other fields
             }
           }`,
           variables: { userId },

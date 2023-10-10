@@ -12,6 +12,17 @@ type Trip {
   destination: String!
 }
 
+input updateTripInput {
+  user: ID
+  flight: FlightInput
+  accommodation: AccommodationInput
+  startDate: DateTime
+  endDate: DateTime
+  activityList: [ActivityInput]
+  packingList: [String]
+  destination: String
+}
+
 input TripInput {
   user: ID!
   flight: FlightInput
@@ -31,7 +42,7 @@ type Query {
 
 type Mutation {
   createTrip(input: TripInput!): Trip
-  updateTrip(id: ID!, input: TripInput): Trip
+  updateTrip(id: ID!, input: updateTripInput): Trip
   deleteTrip(id: ID!): Trip
   addActivityToTrip(tripId: ID!, input: ActivityInput!): Trip
   removeActivityFromTrip(tripId: ID!, activityId: ID!): Trip

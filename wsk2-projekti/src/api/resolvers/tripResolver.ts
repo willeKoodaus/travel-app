@@ -27,7 +27,7 @@ export default {
   Query: {
     trips: async (_parent: undefined, _args: undefined, context: UserIdWithToken) => {
       if (!context.id) throw new Error('Not authenticated');
-      const trips = await tripModel.find();
+      const trips = await tripModel.find({ user: context.id});
       if (trips !== null && trips[0].user.toString() !== context.id) throw new Error('Not authorized because userId does not match id from token');
       return trips;
     },
@@ -54,9 +54,9 @@ export default {
     },
     updateTrip: async (_parent: undefined, args: { id: Types.ObjectId, input: any }, context: UserIdWithToken) => {
       if (!context.id) throw new Error('Not authenticated');
-      if (args.input.user.toString() !== context.id) throw new Error('Not authorized because userId does not match id from token');
       const trip = await tripModel.findById(args.id);
       if (!trip) throw new Error('Trip not found');
+      if (trip.user.toString() !== context.id) throw new Error('Not authorized because userId does not match id from token');
       return await tripModel.findByIdAndUpdate(args.id, args.input, { new: true });
     },
     deleteTrip: async (_parent: undefined, args: { id: Types.ObjectId }, context: UserIdWithToken) => {

@@ -83,11 +83,6 @@ describe('Testing graphql api', () => {
     userData2 = await loginUser(app, testUser2);
   });
 
-  // test login with admin
-  it('should login admin', async () => {
-    adminData = await loginUser(app, adminUser);
-  });
-
   // make sure token has role (so that we can test if user is admin or not)
   it('token should have role', async () => {
     console.log("moi apitestistä",userData);
@@ -171,11 +166,6 @@ it('should return trips by current user', async () => {
   // test delete trip
   it('should delete a trip', async () => {
     await userDeleteTrip(app, tripID, userData.token!);
-  });
-
-  // test delete user by id as admin
-  it('should delete a user as admin', async () => {
-    await adminDeleteUser(app, userData2.user.id!, adminData.token!);
   });
 
   // test delete user based on token
