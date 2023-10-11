@@ -22,7 +22,6 @@ jobs:
           node-version: '18.x'
 
       - name: npm install, build, and test
-        working-directory: ./backend 
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
@@ -31,6 +30,7 @@ jobs:
           REACT_APP_GRAPHQL_URI: ${{ secrets.REACT_APP_GRAPHQL_URI }}
 
         run: |
+          cd backend
           npm install
           npm run build --if-present
           npm run test --if-present
@@ -38,8 +38,8 @@ jobs:
           rm -rf src
 
       - name: Build frontend
-        working-directory: ./frontend
         run: |
+          cd frontend
           npm install
           npm run build
 
