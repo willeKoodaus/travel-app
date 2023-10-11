@@ -42,7 +42,7 @@ const AddFlightPage = () => {
   const [arrivalAirport, setArrivalAirport] = useState('');
 
   const handleAddFlight = async () => {
-    const tripInput = {
+    /*const tripInput = {
         user: userId,
         flight: trip.flight,
         accommodation: trip.accommodation,
@@ -51,7 +51,7 @@ const AddFlightPage = () => {
         activityList: trip.activityList,
         packingList: trip.packingList,
         destination: trip.destination
-    };
+    };*/
     const input = { 
       airline, 
       flightNumber, 

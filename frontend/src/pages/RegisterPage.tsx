@@ -19,7 +19,7 @@ const REGISTER_USER = gql`
 `;
 
 const RegisterPage: React.FC = () => {
-  const [register, { data, loading, error }] = useMutation(REGISTER_USER);  
+  const [register] = useMutation(REGISTER_USER);  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [userName, setUserName] = useState('');

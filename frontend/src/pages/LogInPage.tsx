@@ -1,5 +1,5 @@
 // src/pages/LoginPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { gql, useMutation } from '@apollo/client';
 
@@ -20,10 +20,9 @@ const LOGIN_USER = gql`
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const [login, { data, loading, error }] = useMutation(LOGIN_USER);
+  const [login] = useMutation(LOGIN_USER);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   const handleLogin = async () => {
@@ -39,7 +38,6 @@ const LoginPage: React.FC = () => {
         console.log(response.data); // Log the response to the console
 
         if (response.data.login.message === 'Login successful') {
-            setIsLoggedIn(true);
             sessionStorage.setItem('token', response.data.login.token);
             navigate('/mytrips', { state: { userId: response.data.login.user.id } });
         } 
