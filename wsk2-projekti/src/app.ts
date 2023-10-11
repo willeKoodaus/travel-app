@@ -13,7 +13,8 @@ import {
 import { notFound, errorHandler } from './middlewares';
 import { MyContext } from './interfaces/MyContext';
 import authenticate from './functions/authenticate';
-import { generateText } from './api/apiControllers/gptController'
+import { generateText } from './api/apiControllers/gptController';
+import path from 'path';  // Import the path module
 
 const app = express();
 
@@ -72,6 +73,15 @@ interface Message {
             } catch (error) {
                 res.status(500).json({ error: 'An error occurred' });
             }
+        });
+
+        // Serve static files from the React app
+        app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+        // The "catchall" handler: for any request that doesn't
+        // match one above, send back React's index.html file.
+        app.get('*', (req, res) => {
+            res.sendFile(path.resolve(__dirname, '../frontend/build', 'index.html'));
         });
 
         app.use(notFound);
