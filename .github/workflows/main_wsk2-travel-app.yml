@@ -69,5 +69,5 @@ jobs:
         with:
           app-name: 'wsk2-travel-app'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7CA9E992214142ED905026C0E57A36B8 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C82FE4A21E324606B5BF662D116419D2 }}
           package: .
